@@ -7,18 +7,15 @@ else
     : ${CONTAINER_CLI_COMPOSE:="${CONTAINER_CLI} compose"}
 fi
 
-# Файл docker-compose
 COMPOSE_FILE_BASE=compose-test-net.yaml
 COMPOSE_FILES="-f compose/${COMPOSE_FILE_BASE} -f compose/${CONTAINER_CLI}/${CONTAINER_CLI}-${COMPOSE_FILE_BASE}"
 
-# Получаем путь до сокета docker
 SOCK="${DOCKER_HOST:-/var/run/docker.sock}"
 DOCKER_SOCK="${SOCK##unix://}"
 
 echo "🛑 Stopping Fabric network..."
 DOCKER_SOCK="${DOCKER_SOCK}" ${CONTAINER_CLI_COMPOSE} ${COMPOSE_FILES} down --volumes --remove-orphans
 
-# 🧹 Функция удаления контейнеров
 function clearContainers() {
   echo "🧹 Removing Fabric containers..."
 
@@ -29,7 +26,6 @@ function clearContainers() {
   echo "✅ Containers cleared"
 }
 
-# 🧼 Функция удаления образов chaincode
 function removeUnwantedImages() {
   echo "🧼 Removing chaincode images..."
 
@@ -51,7 +47,6 @@ fi
 rm log.txt
 rm basic_1.0.tar.gz
 
-# 🧱 Удаляем docker volume (данные ledger)
 ${CONTAINER_CLI} volume rm docker_orderer.example.com docker_peer0.org1.example.com docker_peer0.org2.example.com > /dev/null 2>&1 || true
 
-echo "✅ networkDown complete"
+echo "👏 сеть успешно остановлена 👏"

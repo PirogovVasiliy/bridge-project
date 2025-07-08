@@ -23,7 +23,7 @@ func main() {
 	}
 
 	var networkFST hardhat.Network
-	preparation("URL_FST", "DEPLOYER_PRIVATE_KEY_FST", &networkFST)
+	preparation("URL", "DEPLOYER_PRIVATE_KEY", &networkFST)
 	fmt.Println("--- Подключено к hardhat! ---")
 	fmt.Println("--------------------------------------")
 

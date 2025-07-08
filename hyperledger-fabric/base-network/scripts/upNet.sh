@@ -28,8 +28,6 @@ function checkPrereqs() {
     echo "Local fabric binaries and docker images are out of sync. This may cause problems."
     exit 1
   fi
-
-  echo "✅ checkPrereqs"
 }
 
 function createOrgs(){
@@ -75,7 +73,6 @@ function createOrgs(){
 
     echo "Generating CCP files for Org1 and Org2"
     ./organizations/ccp-generate.sh
-    echo "✅ createOrgs"
 }
 
 function networkUp(){
@@ -92,15 +89,11 @@ function networkUp(){
         echo "Unable to start network"
         exit 1
     fi
-
-    echo "✅ networkUp"
 }
 
 COMPOSE_FILE_BASE=compose-test-net.yaml
-
-# Get docker sock path from environment variable
 SOCK="${DOCKER_HOST:-/var/run/docker.sock}"
 DOCKER_SOCK="${SOCK##unix://}"
 
 networkUp
-echo "👏"
+echo "👏 сеть успешно запущена 👏"

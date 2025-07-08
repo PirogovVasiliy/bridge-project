@@ -22,8 +22,6 @@ if [[ $len -ge 4 ]] && [[ ! -d "organizations/peerOrganizations" ]]; then
     exit 1
 fi
 
-#----------------------------------
-
 : ${CHANNEL_NAME:="mychannel"}
 : ${DELAY:="3"}
 : ${MAX_RETRY:="2"}
@@ -52,7 +50,6 @@ createChannelGenesisBlock() {
 	res=$?
 	{ set +x; } 2>/dev/null
     verifyResult $res "Failed to generate channel configuration transaction..."
-    echo "🥳"
 }
 
 createChannel() {
@@ -64,18 +61,13 @@ createChannel() {
 		sleep $DELAY
 		set -x
     	. scripts/orderer.sh ${CHANNEL_NAME}> /dev/null 2>&1
-   		if [ $bft_true -eq 1 ]; then
-			echo "🤡"
-      		. scripts/orderer2.sh ${CHANNEL_NAME}> /dev/null 2>&1
-      		. scripts/orderer3.sh ${CHANNEL_NAME}> /dev/null 2>&1
-      		. scripts/orderer4.sh ${CHANNEL_NAME}> /dev/null 2>&1
-    	fi
+
 		res=$?
 		{ set +x; } 2>/dev/null
 		let rc=$res
 		COUNTER=$(expr $COUNTER + 1)
 	done
-	echo "🥳"
+
 	cat log.txt
 	verifyResult $res "Channel creation failed"
 }
@@ -98,7 +90,6 @@ function joinChannel(){
 	done
 	cat log.txt
 	verifyResult $res "After $MAX_RETRY attempts, peer0.org${ORG} has failed to join channel '$CHANNEL_NAME' "
-	echo "🥳"
 }
 
 function setAnchorPeer(){
@@ -111,24 +102,24 @@ echo "Generating channel genesis block '${CHANNEL_NAME}.block'"
 FABRIC_CFG_PATH=${PWD}/configtx
 export FABRIC_CFG_PATH=${PWD}/configtx
 createChannelGenesisBlock $BFT
-echo "❤️‍🔥"
+echo "✅ done"
 
 echo "Creating channel ${CHANNEL_NAME}"
 createChannel $BFT
-echo "Channel '$CHANNEL_NAME' created"
-echo "❤️‍🔥"
+echo "Channel '$CHANNEL_NAME' created ✅"
 
 echo "Joining org1 peer to the channel..."
 joinChannel 1
+echo "✅ done"
 echo "Joining org2 peer to the channel..."
 joinChannel 2
-echo "❤️‍🔥"
-
-#-------------------------------------
+echo "✅ done"
 
 echo "Setting anchor peer for org1..."
 setAnchorPeer 1
+echo "✅ done"
 echo "Setting anchor peer for org2..."
 setAnchorPeer 2
-echo "💫"
+echo "✅ done"
+echo "💫 канал функционирует 💫"
 

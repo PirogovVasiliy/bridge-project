@@ -37,5 +37,5 @@ func preparation(node string, pk string, network *hardhat.Network) {
 	if err != nil {
 		log.Panic(err)
 	}
-	fmt.Println(network.GetAddress())
+	fmt.Println("contract address:", network.GetAddress())
 }

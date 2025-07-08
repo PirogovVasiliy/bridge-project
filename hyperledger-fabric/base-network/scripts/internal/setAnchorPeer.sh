@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 TEST_NETWORK_HOME=${TEST_NETWORK_HOME:-${PWD}}
-. ${TEST_NETWORK_HOME}/scripts/configUpdate.sh
+. ${TEST_NETWORK_HOME}/scripts/internal/configUpdate.sh
 
 createAnchorPeerUpdate() {
   echo "Fetching channel config for channel $CHANNEL_NAME"

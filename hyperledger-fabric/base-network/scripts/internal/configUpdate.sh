@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 TEST_NETWORK_HOME=${TEST_NETWORK_HOME:-${PWD}}
-. ${TEST_NETWORK_HOME}/scripts/envVar.sh
+. ${TEST_NETWORK_HOME}/scripts/internal/envVar.sh
 
 fetchChannelConfig() {
   ORG=$1

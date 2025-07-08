@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-. scripts/envVar.sh
+. scripts/internal/envVar.sh
 
 : ${CONTAINER_CLI:="docker"}
 if command -v ${CONTAINER_CLI}-compose > /dev/null 2>&1; then
@@ -60,7 +60,7 @@ createChannel() {
 	while [ $rc -ne 0 -a $COUNTER -lt $MAX_RETRY ] ; do
 		sleep $DELAY
 		set -x
-    	. scripts/orderer.sh ${CHANNEL_NAME}> /dev/null 2>&1
+    	. scripts/internal/orderer.sh ${CHANNEL_NAME}> /dev/null 2>&1
 
 		res=$?
 		{ set +x; } 2>/dev/null
@@ -94,7 +94,7 @@ function joinChannel(){
 
 function setAnchorPeer(){
 	ORG=$1
-  	. scripts/setAnchorPeer.sh $ORG $CHANNEL_NAME
+  	. scripts/internal/setAnchorPeer.sh $ORG $CHANNEL_NAME
 }
 
 BLOCKFILE="./channel-artifacts/${CHANNEL_NAME}.block"

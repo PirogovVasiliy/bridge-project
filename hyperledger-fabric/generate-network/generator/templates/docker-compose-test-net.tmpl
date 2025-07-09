@@ -1,0 +1,16 @@
+version: '3.7'
+services:
+{{- range .Orgs }}
+
+  peer0.{{ .Domain }}:
+    container_name: peer0.{{ .Domain }}
+    image: hyperledger/fabric-peer:latest
+    labels: 
+      service: hyperledger-fabric
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_base
+    volumes:
+      - ./docker/peercfg:/etc/hyperledger/peercfg
+      - ${DOCKER_SOCK}:/host/var/run/docker.sock
+{{- end }}

@@ -36,18 +36,37 @@ function createOrgs(){
     if [ -d "organizations/peerOrganizations" ]; then
         rm -Rf organizations/peerOrganizations && rm -Rf organizations/ordererOrganizations
     fi
-    echo "✅"
 
     which cryptogen
     if [ "$?" -ne 0 ]; then
       echo "cryptogen tool not found. exiting"
       exit 1
     fi
-    echo "✅"
 
     scripts/internal/run-cryptogen.sh
-    echo "✅"
 }
 
-createOrgs
+function networkUp(){
+  checkPrereqs
+
+  createOrgs
+
+  COMPOSE_FILES="-f compose/${COMPOSE_FILE_BASE} -f compose/${CONTAINER_CLI}/${CONTAINER_CLI}-${COMPOSE_FILE_BASE}"
+
+  DOCKER_SOCK="${DOCKER_SOCK}" ${CONTAINER_CLI_COMPOSE} ${COMPOSE_FILES} up -d 2>&1
+
+  $CONTAINER_CLI ps -a
+  if [ $? -ne 0 ]; then
+    echo "Unable to start network"
+    exit 1
+  fi
+
+}
+
+COMPOSE_FILE_BASE=compose-test-net.yaml
+SOCK="${DOCKER_HOST:-/var/run/docker.sock}"
+DOCKER_SOCK="${SOCK##unix://}"
+
+networkUp
+
 echo "👏 сеть успешно запущена 👏"

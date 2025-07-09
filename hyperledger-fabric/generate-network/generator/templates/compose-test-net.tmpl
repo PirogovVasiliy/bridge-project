@@ -1,0 +1,96 @@
+version: '3.7'
+
+volumes:
+  orderer.example.com:
+{{- range .Orgs }}
+  peer0.{{ .Domain }}:
+{{- end }}
+
+networks:
+  base:
+    name: fabric_base
+
+services:
+
+  orderer.example.com:
+    container_name: orderer.example.com
+    image: hyperledger/fabric-orderer:latest
+    labels: 
+      service: hyperledger-fabric
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_LISTENPORT=7050
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_BOOTSTRAPMETHOD=none
+      - ORDERER_CHANNELPARTICIPATION_ENABLED=true
+      - ORDERER_ADMIN_TLS_ENABLED=true
+      - ORDERER_ADMIN_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_ADMIN_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_ADMIN_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_ADMIN_TLS_CLIENTROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_ADMIN_LISTENADDRESS=0.0.0.0:7053
+      - ORDERER_OPERATIONS_LISTENADDRESS=orderer.example.com:9443
+      - ORDERER_METRICS_PROVIDER=prometheus
+    working_dir: /root
+    command: orderer
+    volumes:
+      - ../organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp:/var/hyperledger/orderer/msp
+      - ../organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls:/var/hyperledger/orderer/tls
+      - orderer.example.com:/var/hyperledger/production/orderer
+    ports: 
+      - 7050:7050
+      - 7053:7053
+      - 9443:9443
+    networks:
+      - base
+
+{{- range .Orgs }}
+
+  peer0.{{ .Domain }}:
+    container_name: peer0.{{ .Domain }}
+    image: hyperledger/fabric-peer:latest
+    labels: 
+      service: hyperledger-fabric
+    environment:
+      - FABRIC_CFG_PATH=/etc/hyperledger/peercfg
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_PROFILE_ENABLED=false
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+
+      - CORE_PEER_ID=peer0.{{ .Domain }}
+      - CORE_PEER_ADDRESS=peer0.{{ .Domain }}:{{ .PeerPort }}
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:{{ .PeerPort }}
+      - CORE_PEER_CHAINCODEADDRESS=peer0.{{ .Domain }}:{{ .ChaincodePort }}
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:{{ .ChaincodePort }}
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.{{ .Domain }}:{{ .PeerPort }}
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.{{ .Domain }}:{{ .PeerPort }}
+      - CORE_PEER_LOCALMSPID={{ .MSP }}
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_OPERATIONS_LISTENADDRESS=peer0.{{ .Domain }}:{{ .OpsPort }}
+      - CORE_METRICS_PROVIDER=prometheus
+      - CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer0{{ .Name }}"}
+      - CORE_CHAINCODE_EXECUTETIMEOUT=300s
+
+    volumes:
+      - ../organizations/peerOrganizations/{{ .Domain }}/peers/peer0.{{ .Domain }}:/etc/hyperledger/fabric
+      - peer0.{{ .Domain }}:/var/hyperledger/production
+    working_dir: /root
+    command: peer node start
+    ports:
+      - {{ .PeerPort }}:{{ .PeerPort }}
+      - {{ .OpsPort }}:{{ .OpsPort }}
+    networks:  
+      - base
+{{- end }}

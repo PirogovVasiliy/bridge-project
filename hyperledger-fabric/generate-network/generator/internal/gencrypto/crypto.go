@@ -1,4 +1,4 @@
-package mycrypto
+package gencrypto
 
 import (
 	"fmt"
@@ -38,7 +38,7 @@ func GenerateCryptoConfig(orgs []Org) error {
 			return err
 		}
 		f.Close()
-		fmt.Printf("  • %s создан\n", dst)
+		fmt.Printf("%s успешно создан\n", dst)
 	}
 	return nil
 }

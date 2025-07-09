@@ -1,21 +1,24 @@
 package main
 
 import (
-	"fmt"
-	"generator/internal/mycrypto"
+	"generator/internal/gencompose"
+	"generator/internal/gencrypto"
 	"log"
 )
 
 func main() {
-	orgs := []mycrypto.Org{
-		{Name: "logitech", Domain: "Logitech.com", Users: 3},
+
+	orgs := []gencrypto.Org{
+		{Name: "logitech", Domain: "logitech.com", Users: 3},
 		{Name: "zetgaming", Domain: "zetgaming.com", Users: 1},
+		{Name: "acer", Domain: "acer.com", Users: 1},
 	}
 
-	fmt.Println(orgs[0])
-	fmt.Println(orgs[1])
+	if err := gencrypto.GenerateCryptoConfig(orgs); err != nil {
+		log.Fatalln("generate crypto-config error", err)
+	}
 
-	if err := mycrypto.GenerateCryptoConfig(orgs); err != nil {
-		log.Fatalf("ошибка генерации: %v", err)
+	if err := gencompose.Generate(orgs); err != nil {
+		log.Fatalln("generate compose error", err)
 	}
 }

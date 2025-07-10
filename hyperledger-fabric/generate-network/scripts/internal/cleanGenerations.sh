@@ -17,6 +17,8 @@ function cleaningGenerations(){
   rm configtx/configtx.yaml
   rm -rf channel-artifacts
   rm log.txt
+  rm basic_1.0.tar.gz
+  rm deployToken.sh
 }
 
 cleaningGenerations

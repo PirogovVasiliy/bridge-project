@@ -1,7 +1,6 @@
 version: '3.7'
 services:
 {{- range .Orgs }}
-
   peer0.{{ .Domain }}:
     container_name: peer0.{{ .Domain }}
     image: hyperledger/fabric-peer:latest

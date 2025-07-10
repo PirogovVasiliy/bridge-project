@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 )
 
@@ -28,7 +29,7 @@ func GenerateCryptoConfig(orgs []Org) error {
 	for _, org := range orgs {
 		dst := filepath.Join(
 			outputDir,
-			fmt.Sprintf("crypto-config-%s.yaml", org.Name))
+			fmt.Sprintf("crypto-config-%s.yaml", strings.ToLower(org.Name)))
 
 		f, err := os.Create(dst)
 		if err != nil {

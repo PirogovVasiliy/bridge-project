@@ -35,6 +35,8 @@ func enrich(orgs []gencrypto.Org) []OrgCompose {
 			OpsPort:       9444 + (idx - 1), // 9444, 9445…
 		}
 	}
+	//composeOrgs[0].MSP = "Org1MSP"
+	//composeOrgs[1].MSP = "Org2MSP"
 	return composeOrgs
 }
 

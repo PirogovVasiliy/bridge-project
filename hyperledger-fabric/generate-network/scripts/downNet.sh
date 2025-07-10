@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 : ${CONTAINER_CLI:="docker"}
 if command -v ${CONTAINER_CLI}-compose > /dev/null 2>&1; then
     : ${CONTAINER_CLI_COMPOSE:="${CONTAINER_CLI}-compose"}
@@ -32,31 +34,22 @@ function removeUnwantedImages() {
   echo "✅ Chaincode images removed"
 }
 
+function removeVolumes(){
+  echo "🧹 Removing named volumes..."
+  vols=(docker_orderer.example.com)
+  if [ -d "organizations/peerOrganizations" ]; then
+    for dir in organizations/peerOrganizations/*; do
+      org=$(basename "$dir")
+      vols+=(docker_peer0.${org})
+    done
+  fi
+  ${CONTAINER_CLI} volume rm "${vols[@]}" 2>/dev/null || true
+  echo "✅ Volumes removed"
+}
+
 clearContainers
 removeUnwantedImages
-
-echo "🧹 Cleaning up artifacts..."
-CFG_DIR="organizations/cryptogen"
-find "$CFG_DIR" -maxdepth 1 -type f -name 'crypto-config-*.yaml' \
-     ! -name 'crypto-config-orderer.yaml' \
-     -exec rm -v {} \;
-
-if [ -d "organizations/peerOrganizations" ]; then
-    rm -Rf organizations/peerOrganizations && rm -Rf organizations/ordererOrganizations
-fi
-
-rm compose/compose-test-net.yaml
-rm compose/docker/docker-compose-test-net.yaml
-
-echo "🧹 Removing named volumes..."
-vols=(docker_orderer.example.com)
-if [ -d "organizations/peerOrganizations" ]; then
-  for dir in organizations/peerOrganizations/*; do
-    org=$(basename "$dir")
-    vols+=(docker_peer0.${org})
-  done
-fi
-${CONTAINER_CLI} volume rm "${vols[@]}" 2>/dev/null || true
-echo "✅ Volumes removed"
+removeVolumes
+./scripts/internal/cleanGenerations.sh
 
 echo "👏 сеть успешно остановлена 👏"

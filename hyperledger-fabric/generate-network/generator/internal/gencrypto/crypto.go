@@ -38,7 +38,7 @@ func GenerateCryptoConfig(orgs []Org) error {
 			return err
 		}
 		f.Close()
-		fmt.Printf("%s успешно создан\n", dst)
+		fmt.Printf("📦  %s создан\n", dst)
 	}
 	return nil
 }

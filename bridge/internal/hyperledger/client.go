@@ -16,13 +16,13 @@ import (
 )
 
 const (
-	mspID         = "Org1MSP"
-	cryptoPath    = "../../hyperledger-fabric/base-network/organizations/peerOrganizations/org1.example.com"
-	certPath      = cryptoPath + "/users/Admin@org1.example.com/msp/signcerts"
-	keyPath       = cryptoPath + "/users/Admin@org1.example.com/msp/keystore"
-	tlsCertPath   = cryptoPath + "/peers/peer0.org1.example.com/tls/ca.crt"
+	mspID         = "LogitechMSP"
+	cryptoPath    = "../../hyperledger-fabric/generate-network/organizations/peerOrganizations/logitech.com"
+	certPath      = cryptoPath + "/users/Admin@logitech.com/msp/signcerts"
+	keyPath       = cryptoPath + "/users/Admin@logitech.com/msp/keystore"
+	tlsCertPath   = cryptoPath + "/peers/peer0.logitech.com/tls/ca.crt"
 	peerEndpoint  = "dns:///localhost:7051"
-	gatewayPeer   = "peer0.org1.example.com"
+	gatewayPeer   = "peer0.logitech.com"
 	chaincodeName = "basic"
 	channelName   = "mychannel"
 )

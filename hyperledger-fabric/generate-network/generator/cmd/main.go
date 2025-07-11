@@ -16,8 +16,8 @@ func main() {
 		//{Name: "Org2", Domain: "org2.example.com", Users: 1},
 		{Name: "Logitech", Domain: "logitech.com", Users: 3},
 		{Name: "Zetgaming", Domain: "zetgaming.com", Users: 1},
-		//{Name: "acer", Domain: "acer.com", Users: 1},
-		//{Name: "axnot", Domain: "axnot.com", Users: 2},
+		{Name: "acer", Domain: "acer.com", Users: 1},
+		{Name: "axnot", Domain: "axnot.com", Users: 2},
 	}
 
 	if err := gencrypto.GenerateCryptoConfig(orgs); err != nil {

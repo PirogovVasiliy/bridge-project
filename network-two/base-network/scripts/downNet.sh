@@ -14,7 +14,9 @@ SOCK="${DOCKER_HOST:-/var/run/docker.sock}"
 DOCKER_SOCK="${SOCK##unix://}"
 
 echo "🛑 Stopping Fabric network..."
-DOCKER_SOCK="${DOCKER_SOCK}" ${CONTAINER_CLI_COMPOSE} ${COMPOSE_FILES} down --volumes --remove-orphans
+COMPOSE_PROJECT="net2"
+DOCKER_SOCK="${DOCKER_SOCK}" ${CONTAINER_CLI_COMPOSE} -p "$COMPOSE_PROJECT" ${COMPOSE_FILES} down --volumes --remove-orphans
+
 
 function clearContainers() {
   echo "🧹 Removing Fabric containers..."

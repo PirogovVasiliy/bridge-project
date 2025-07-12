@@ -25,14 +25,14 @@ func enrich(orgs []gencrypto.Org) []OrgCompose {
 	composeOrgs := make([]OrgCompose, len(orgs))
 	for i, o := range orgs {
 		idx := i + 1
-		p := 7051 + (idx-1)*2000 // 7051, 9051 …
+		p := 11051 + (idx-1)*2000 // 7051, 9051 …
 		composeOrgs[i] = OrgCompose{
 			Name:          o.Name,
 			Domain:        o.Domain,
 			MSP:           fmt.Sprintf("%sMSP", o.Name),
 			PeerPort:      p,
 			ChaincodePort: p + 1,
-			OpsPort:       9444 + (idx - 1), // 9444, 9445…
+			OpsPort:       9446 + (idx - 1), // 9444, 9445…
 		}
 	}
 	//composeOrgs[0].MSP = "Org1MSP"

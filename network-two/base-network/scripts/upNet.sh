@@ -9,27 +9,6 @@ fi
 
 CRYPTO="cryptogen"
 
-function checkPrereqs() {
-
-  peer version > /dev/null 2>&1
-
-  if [[ $? -ne 0 || ! -d "../config" ]]; then
-    echo "Peer binary and configuration files not found.."
-    exit 1
-  fi
-
-  LOCAL_VERSION=$(peer version | sed -ne 's/^ Version: //p')
-  DOCKER_IMAGE_VERSION=$(${CONTAINER_CLI} run --rm hyperledger/fabric-peer:latest peer version | sed -ne 's/^ Version: //p')
-
-  echo "LOCAL_VERSION=$LOCAL_VERSION"
-  echo "DOCKER_IMAGE_VERSION=$DOCKER_IMAGE_VERSION"
-
-  if [ "$LOCAL_VERSION" != "$DOCKER_IMAGE_VERSION" ]; then
-    echo "Local fabric binaries and docker images are out of sync. This may cause problems."
-    exit 1
-  fi
-}
-
 function createOrgs(){
     if [ -d "organizations/peerOrganizations" ]; then
         rm -Rf organizations/peerOrganizations && rm -Rf organizations/ordererOrganizations
@@ -72,17 +51,17 @@ function createOrgs(){
     fi
 
     echo "Generating CCP files for Org1 and Org2"
-    ./organizations/ccp-generate.sh
+    #./organizations/ccp-generate.sh
 }
 
 function networkUp(){
-    checkPrereqs
-
     createOrgs
 
     COMPOSE_FILES="-f compose/${COMPOSE_FILE_BASE} -f compose/${CONTAINER_CLI}/${CONTAINER_CLI}-${COMPOSE_FILE_BASE}"
 
-    DOCKER_SOCK="${DOCKER_SOCK}" ${CONTAINER_CLI_COMPOSE} ${COMPOSE_FILES} up -d 2>&1
+    COMPOSE_PROJECT="net2"
+    DOCKER_SOCK="${DOCKER_SOCK}" \
+    ${CONTAINER_CLI_COMPOSE} -p "$COMPOSE_PROJECT" ${COMPOSE_FILES} up -d 2>&1
 
     $CONTAINER_CLI ps -a
     if [ $? -ne 0 ]; then

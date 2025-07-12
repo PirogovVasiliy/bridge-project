@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export PATH=${PWD}/../bin:$PATH
-export FABRIC_CFG_PATH=${PWD}/../config/
+export FABRIC_CFG_PATH=${PWD}/compose/docker/peercfg/
 
 CHAINCODE_NAME=basic
 CHAINCODE_LABEL=basic_1.0
@@ -24,7 +24,7 @@ export CORE_PEER_TLS_ENABLED=true
 export CORE_PEER_LOCALMSPID="Org1MSP"
 export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
 export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-export CORE_PEER_ADDRESS=localhost:7051
+export CORE_PEER_ADDRESS=localhost:7151
 peer lifecycle chaincode install ${CHAINCODE_LABEL}.tar.gz
 echo "✅ Установлено на Org1"
 
@@ -32,7 +32,7 @@ echo "Установка на Org2..."
 export CORE_PEER_LOCALMSPID="Org2MSP"
 export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
 export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
-export CORE_PEER_ADDRESS=localhost:9051
+export CORE_PEER_ADDRESS=localhost:9151
 peer lifecycle chaincode install ${CHAINCODE_LABEL}.tar.gz
 echo "✅ Установлено на Org2"
 
@@ -40,7 +40,7 @@ PACKAGE_ID=$(peer lifecycle chaincode queryinstalled | grep ${CHAINCODE_LABEL} |
 echo "📦 Package ID: $PACKAGE_ID"
 
 echo "Одобрение Org2"
-peer lifecycle chaincode approveformyorg -o localhost:7050 \
+peer lifecycle chaincode approveformyorg -o localhost:8050 \
 --ordererTLSHostnameOverride orderer.example.com \
 --channelID ${CHANNEL_NAME} --name ${CHAINCODE_NAME} \
 --version ${CHAINCODE_VERSION} --package-id ${PACKAGE_ID} \
@@ -52,8 +52,8 @@ echo "Одобрение Org1"
 export CORE_PEER_LOCALMSPID="Org1MSP"
 export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
 export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-export CORE_PEER_ADDRESS=localhost:7051
-peer lifecycle chaincode approveformyorg -o localhost:7050 \
+export CORE_PEER_ADDRESS=localhost:7151
+peer lifecycle chaincode approveformyorg -o localhost:8050 \
 --ordererTLSHostnameOverride orderer.example.com \
 --channelID ${CHANNEL_NAME} --name ${CHAINCODE_NAME} \
 --version ${CHAINCODE_VERSION} --package-id ${PACKAGE_ID} \
@@ -68,13 +68,13 @@ peer lifecycle chaincode checkcommitreadiness \
 --output json
 
 echo "Выполняем коммит..."
-peer lifecycle chaincode commit -o localhost:7050 \
+peer lifecycle chaincode commit -o localhost:8050 \
 --ordererTLSHostnameOverride orderer.example.com --channelID ${CHANNEL_NAME} \
 --name ${CHAINCODE_NAME} --version ${CHAINCODE_VERSION} --sequence ${SEQUENCE} \
 --tls --cafile "${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem" \
---peerAddresses localhost:7051 \
+--peerAddresses localhost:7151 \
 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt" \
---peerAddresses localhost:9051 \
+--peerAddresses localhost:9151 \
 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt"
 echo "✅ Коммит выполнен"
 

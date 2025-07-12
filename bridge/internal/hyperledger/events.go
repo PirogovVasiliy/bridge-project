@@ -16,7 +16,7 @@ type TransferEvent struct {
 func (TrEv TransferEvent) GetAddress() string { return TrEv.Address }
 func (TrEv TransferEvent) GetAmount() string  { return TrEv.Amount }
 
-func ListenTransfer(ctx context.Context, network *client.Network, outChanal chan<- TransferEvent) {
+func ListenTransfer(ctx context.Context, network *client.Network, outChanal chan<- TransferEvent, chaincodeName string) {
 	events, err := network.ChaincodeEvents(ctx, chaincodeName)
 	if err != nil {
 		log.Fatalln("Ошибка прослушивания событий hyperledger!", err)

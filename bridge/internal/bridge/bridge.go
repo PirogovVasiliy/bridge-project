@@ -21,7 +21,7 @@ func Bridge(network *hardhat.Network, contract *client.Contract, hyperledgerNetw
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	hyperChan := make(chan hyperledger.TransferEvent)
-	go hyperledger.ListenTransfer(ctx, hyperledgerNetwork, hyperChan)
+	go hyperledger.ListenTransfer(ctx, hyperledgerNetwork, hyperChan, "basic")
 	fmt.Println("Начинаем слушать события с Hyperledger!")
 	fmt.Println("-----------------------------------------")
 

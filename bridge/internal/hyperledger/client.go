@@ -15,26 +15,23 @@ import (
 	"google.golang.org/grpc/credentials"
 )
 
-const (
-	mspID         = "LogitechMSP"
-	cryptoPath    = "../../hyperledger-fabric/generate-network/organizations/peerOrganizations/logitech.com"
-	certPath      = cryptoPath + "/users/Admin@logitech.com/msp/signcerts"
-	keyPath       = cryptoPath + "/users/Admin@logitech.com/msp/keystore"
-	tlsCertPath   = cryptoPath + "/peers/peer0.logitech.com/tls/ca.crt"
-	peerEndpoint  = "dns:///localhost:7051"
-	gatewayPeer   = "peer0.logitech.com"
-	chaincodeName = "basic"
-	channelName   = "mychannel"
-)
+func ConnectToContract(mspID string,
+	certPath string,
+	keyPath string,
+	tlsCertPath string,
+	peerEndpoint string,
+	gatewayPeer string,
+	chaincodeName string,
+	channelName string,
+) (*client.Network, *client.Contract) {
 
-func ConnectToContract() (*client.Network, *client.Contract) {
-	clientConnect, err := connect()
+	clientConnect, err := connect(tlsCertPath, gatewayPeer, peerEndpoint)
 	if err != nil {
 		log.Fatalln("Ошибка подключения grpc!", err)
 	}
 
-	id := newIdentity()
-	sign := newSign()
+	id := newIdentity(certPath, mspID)
+	sign := newSign(keyPath)
 
 	gw, err := client.Connect(
 		id,
@@ -66,7 +63,7 @@ func ConnectToContract() (*client.Network, *client.Contract) {
 	return network, contract
 }
 
-func connect() (*grpc.ClientConn, error) {
+func connect(tlsCertPath string, gatewayPeer string, peerEndpoint string) (*grpc.ClientConn, error) {
 	certificatePEM, err := os.ReadFile(tlsCertPath)
 	if err != nil {
 		return nil, err
@@ -89,7 +86,7 @@ func connect() (*grpc.ClientConn, error) {
 	return connection, nil
 }
 
-func newIdentity() *identity.X509Identity {
+func newIdentity(certPath string, mspID string) *identity.X509Identity {
 	certificatePEM, err := readFirstFile(certPath)
 	if err != nil {
 		panic(fmt.Errorf("failed to read certificate file: %w", err))
@@ -108,7 +105,7 @@ func newIdentity() *identity.X509Identity {
 	return id
 }
 
-func newSign() identity.Sign {
+func newSign(keyPath string) identity.Sign {
 	privateKeyPEM, err := readFirstFile(keyPath)
 	if err != nil {
 		panic(fmt.Errorf("failed to read private key file: %w", err))

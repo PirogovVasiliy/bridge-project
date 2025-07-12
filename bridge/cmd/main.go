@@ -11,9 +11,22 @@ import (
 	"github.com/joho/godotenv"
 )
 
+const (
+	mspID         = "LogitechMSP"
+	cryptoPath    = "../../hyperledger-fabric/generate-network/organizations/peerOrganizations/logitech.com"
+	certPath      = cryptoPath + "/users/Admin@logitech.com/msp/signcerts"
+	keyPath       = cryptoPath + "/users/Admin@logitech.com/msp/keystore"
+	tlsCertPath   = cryptoPath + "/peers/peer0.logitech.com/tls/ca.crt"
+	peerEndpoint  = "dns:///localhost:11051"
+	gatewayPeer   = "peer0.logitech.com"
+	chaincodeName = "basic"
+	channelName   = "mychannel"
+)
+
 func main() {
 
-	hyperledgerNetwork, contract := hyperledger.ConnectToContract()
+	hyperledgerNetwork, contract := hyperledger.ConnectToContract(
+		mspID, certPath, keyPath, tlsCertPath, peerEndpoint, gatewayPeer, chaincodeName, channelName)
 	fmt.Println("--- Подключено к hyperledger! ---")
 	fmt.Println("--------------------------------------")
 

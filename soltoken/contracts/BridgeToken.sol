@@ -7,13 +7,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract BridgeToken is ERC20, Ownable{
     constructor() ERC20("BridgeToken", "BT") Ownable(msg.sender){}
 
-    event TokensSentToBridge(string to, uint amount);
+    event TokensSentToBridge(string to, uint amount, uint chainID);
 
-    function sendTokensToBridge(string memory to, uint amount) external{
+    function sendTokensToBridge(string memory to, uint amount, uint chainID) external{
         require(amount > 0, "Amount of transaction can not be zero!");
         require (balanceOf(msg.sender) >= amount, "Not enough tokens!");
         _burn(msg.sender, amount);
-        emit TokensSentToBridge(to, amount);
+        emit TokensSentToBridge(to, amount , chainID);
     }
 
     function receiveFromBridge(address to, uint amount)external onlyOwner{

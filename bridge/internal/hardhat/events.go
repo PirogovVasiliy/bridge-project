@@ -12,10 +12,12 @@ import (
 type TransferEvent struct {
 	address string
 	amount  *big.Int
+	chainID *big.Int
 }
 
 func (TrEv TransferEvent) GetAddress() string  { return TrEv.address }
 func (TrEv TransferEvent) GetAmount() *big.Int { return TrEv.amount }
+func (TrEv TransferEvent) GetChainID() int     { return int(TrEv.chainID.Int64()) }
 
 func ListenTransfer(btInstance *contract.BridgeToken, outChanal chan<- TransferEvent) {
 
@@ -33,7 +35,7 @@ func ListenTransfer(btInstance *contract.BridgeToken, outChanal chan<- TransferE
 		case err := <-subscription.Err():
 			log.Fatalln("Ошибка чтения события TokensSentToBridge!", err)
 		case event := <-transferChanal:
-			outChanal <- TransferEvent{event.To, event.Amount}
+			outChanal <- TransferEvent{event.To, event.Amount, event.ChainID}
 		}
 	}
 }

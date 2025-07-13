@@ -61,3 +61,32 @@ func CallReceiveFromBridge(
 	}
 	return nil
 }
+
+func CallSendToBridge(
+	client *ethclient.Client,
+	btInstance *contract.BridgeToken,
+	privateKey *ecdsa.PrivateKey,
+	chainID *big.Int,
+	to string,
+	amountStr string,
+	hyperledgerChainID int,
+) error {
+	auth, err := bind.NewKeyedTransactorWithChainID(privateKey, chainID)
+	if err != nil {
+		return err
+	}
+
+	amount := big.NewInt(0)
+	amount.SetString(amountStr, 10)
+	id := big.NewInt(int64(hyperledgerChainID))
+	tx, err := btInstance.SendTokensToBridge(auth, to, amount, id)
+	if err != nil {
+		return err
+	}
+
+	_, err = bind.WaitMined(context.Background(), client, tx)
+	if err != nil {
+		return err
+	}
+	return nil
+}

@@ -50,7 +50,6 @@ func ConnectToContract(mspID string,
 	network := gw.GetNetwork(channelName)
 	contract := network.GetContract(chaincodeName)
 
-	fmt.Println("53!!!!!!")
 	err = CallInitialize(contract, "BridgeToken", "BT")
 	if err != nil {
 		panic(err)

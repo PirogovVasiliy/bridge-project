@@ -11,8 +11,6 @@ import (
 	"github.com/hyperledger/fabric-gateway/pkg/client"
 )
 
-const ownerAddress = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
-
 func Bridge(network *hardhat.Network,
 	contractFst *client.Contract, hyperledgerNetworkFst *client.Network,
 	contractSec *client.Contract, hyperledgerNetworkSec *client.Network,
@@ -23,17 +21,15 @@ func Bridge(network *hardhat.Network,
 	fmt.Println("-----------------------------------------")
 
 	eventChanFst := make(chan hyperledger.TransferEvent)
-	ctxFst, cancelFst := context.WithCancel(context.Background())
-	defer cancelFst()
 	eventChanSec := make(chan hyperledger.TransferEvent)
-	ctxSec, cancelSec := context.WithCancel(context.Background())
-	defer cancelSec()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
-	go hyperledger.ListenTransfer(ctxFst, hyperledgerNetworkFst, eventChanFst, "basic")
+	go hyperledger.ListenTransfer(ctx, hyperledgerNetworkFst, eventChanFst, "basic")
 	fmt.Println("Начинаем слушать события первой сети hyperledger!")
 	fmt.Println("-----------------------------------------")
 
-	go hyperledger.ListenTransfer(ctxSec, hyperledgerNetworkSec, eventChanSec, "basic")
+	go hyperledger.ListenTransfer(ctx, hyperledgerNetworkSec, eventChanSec, "basic")
 	fmt.Println("Начинаем слушать события второй сети hyperledger!")
 	fmt.Println("-----------------------------------------")
 
@@ -57,13 +53,13 @@ func Bridge(network *hardhat.Network,
 			fmt.Println("Address:", event.Address)
 			fmt.Println("Amount:", event.Amount)
 			fmt.Println("-----------------------------------------")
-			transferHardhatHelper(network, &event, 2)
+			transferHardhatHelper(network, &event)
 		case event := <-eventChanSec:
 			fmt.Println("--- Получено событие со второй сети Hyperledger! ---")
 			fmt.Println("Address:", event.Address)
 			fmt.Println("Amount:", event.Amount)
 			fmt.Println("-----------------------------------------")
-			transferHardhatHelper(network, &event, 1)
+			transferHardhatHelper(network, &event)
 		}
 	}
 }
@@ -82,29 +78,16 @@ func transferHyperledgerHelper(contract *client.Contract, event *hardhat.Transfe
 	fmt.Println("-----------------------------------------")
 }
 
-func transferHardhatHelper(hardhatNetwork *hardhat.Network, event *hyperledger.TransferEvent, chainID int) {
+func transferHardhatHelper(hardhatNetwork *hardhat.Network, event *hyperledger.TransferEvent) {
 	err := hardhat.CallReceiveFromBridge(
 		hardhatNetwork.GetClient(),
 		hardhatNetwork.GetContract(),
 		hardhatNetwork.GetPK(),
 		hardhatNetwork.GetChainID(),
-		common.HexToAddress(ownerAddress),
+		common.HexToAddress(event.Address),
 		event.Amount,
 	)
 	if err != nil {
 		log.Fatalln("Ошибка вызова ReceiveFromBridge!", err)
-	}
-
-	err = hardhat.CallSendToBridge(
-		hardhatNetwork.GetClient(),
-		hardhatNetwork.GetContract(),
-		hardhatNetwork.GetPK(),
-		hardhatNetwork.GetChainID(),
-		event.GetAddress(),
-		event.GetAmount(),
-		chainID,
-	)
-	if err != nil {
-		log.Fatalln("Ошибка вызова SendToBridge!", err)
 	}
 }
